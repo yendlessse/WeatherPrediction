@@ -27,8 +27,9 @@
 | 단계 | 적용 모델 | Validation Accuracy | 비고 |
 | :--- | :--- | :--- | :--- |
 | **Step 1** | RandomForest | **0.7087** | 초기 베이스라인 |
-| **Step 2** | XGBoost (Base) | **0.7742** | 알고리즘 전환 후 급성장 |
-| **Step 3** | **K-Fold CV** | **0.7721** | 모델 안정성 및 신뢰도 검증 완료 |
+| **Step 2** | Feature Engineering | **0.7354** | 파생변수 만들기 |
+| **Step 2** | XGBoost (Base) | **0.7694** | 알고리즘 전환 후 급성장 |
+| **Step 3** | **Ensemble** | **0.78** | 모델 안정성 및 신뢰도 검증 완료 |
 
 ---
 
