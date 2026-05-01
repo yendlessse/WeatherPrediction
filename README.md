@@ -29,7 +29,7 @@
 | **Step 1** | RandomForest | **0.7087** | 초기 베이스라인 |
 | **Step 2** | Feature Engineering | **0.7354** | 파생변수 만들기 |
 | **Step 2** | XGBoost (Base) | **0.7694** | 알고리즘 전환 후 급성장 |
-| **Step 3** | **Ensemble** | **0.78** | 모델 안정성 및 신뢰도 검증 완료 |
+| **Step 3** | **Ensemble** | **0.7839** | 모델 안정성 및 신뢰도 검증 완료 |
 
 ---
 
