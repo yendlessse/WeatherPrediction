@@ -1,37 +1,169 @@
-# 🌦️ Weather Prediction Project
 
-이 프로젝트는 기상 관측 데이터를 바탕으로 **'맑음', '흐림', '비'**의 3가지 날씨 상태를 예측하는 머신러닝 모델을 구축한 프로젝트입니다.
+# 🌦️ Weather Prediction Model (ML Pipeline Evolution)
 
-## 🛠️ 작업 프로세스 및 분석 내용
+## 📌 프로젝트 개요
 
-### 1. 데이터 탐색 및 특징 분석 (EDA)
-*   **주요 변수**: 기온(C), 풍속(m/s), 습도(%), 증기압(hPa), 이슬점(C), 기압(hPa), 운량(cloud), 풍향(sin/cos) 등
-*   **특징 중요도 분석**: `featureImportance.png`를 통해 분석한 결과, **운량(cloud)**이 모델 예측에 가장 압도적인 영향을 주는 핵심 변수임을 확인했습니다.
-
-### 2. 모델 선택 및 최적화 전략
-초기 **RandomForest** 모델에서 시작하여 점진적으로 성능을 고도화했습니다.
-
-*   **RandomForest**: 초기 베이스라인 모델로 사용.
-*   **XGBoost**: 오차를 보완하며 학습하는 부스팅 알고리즘으로 전환하여 성능을 쥐어짜는 전략 선택.
-*   **하이퍼파라미터 튜닝**: `n_estimators`, `learning_rate`, `max_depth` 등을 조정하여 과적합을 방지하고 일반화 성능을 확보했습니다.
-
-### 3. 주요 기법 (Key Techniques)
-*   **Feature Engineering**: 기상학적 특성을 반영하기 위해 변수 간의 관계를 분석했습니다.
-*   **K-Fold 교차 검증**: 데이터 분할의 우연성을 배제하고 모델의 실제 실력을 검증하기 위해 `cv=5` 설정을 활용했습니다.
-*   **Overfitting 방지**: `subsample`, `colsample_bytree` 설정을 통해 특정 변수에 과하게 의존하지 않도록 규제했습니다.
-
-## 📈 모델 성능 (Model Performance)
-
-단계별 성능 향상 수치는 다음과 같습니다.
-
-| 단계 | 적용 모델 | Validation Accuracy | 비고 |
-| :--- | :--- | :--- | :--- |
-| **Step 1** | RandomForest | **0.7087** | 초기 베이스라인 |
-| **Step 2** | Feature Engineering | **0.7354** | 파생변수 만들기 |
-| **Step 2** | XGBoost (Base) | **0.7694** | 알고리즘 전환 후 급성장 |
-| **Step 3** | **Ensemble** | **0.7839** | 모델 안정성 및 신뢰도 검증 완료 |
+기상 데이터를 기반으로 날씨 상태(`weather label`)를 예측하는 머신러닝 모델
+단순 모델에서 시작하여 점진적으로 성능을 개선하며 **앙상블 기반 고성능 모델**까지 발전
 
 ---
 
-## 🚀 실행 및 결과 저장
-*   최종 모델은 `Submission_example.csv` 양식에 맞춰 `weather label` 컬럼을 포함한 `pred.csv` 파일로 결과를 출력합니다.
+## 🚀 모델 발전 과정
+
+### 1️⃣ Baseline (Notebook Version)
+
+> `baseline.ibynb`
+
+#### ✔ 특징
+
+* RandomForest / XGBoost 단일 모델 실험
+* Train/Test Split 기반 검증
+* 기본적인 Feature Engineering 적용
+
+#### ✔ 한계
+
+* 데이터 분할이 단순하여 **일반화 성능 부족**
+* 모델 성능 불안정
+
+---
+
+### 2️⃣ Improve Version (Stacking)
+
+> `WeatherPrediction2.ibynb`
+
+#### ✔ 개선 내용
+
+* `StratifiedKFold` 적용 (데이터 분포 유지)
+* XGBoost + RandomForest → **Stacking Ensemble**
+* Meta Model: Logistic Regression
+
+#### ✔ 핵심 구조
+
+```
+XGB + RF → Logistic Regression → 최종 예측
+```
+
+#### ✔ 결과
+
+* OOF 기반 평가로 **신뢰도 상승**
+* Baseline 대비 성능 향상
+* 하지만 구조가 복잡하고 과적합 가능성 존재
+
+<img width="576" height="455" alt="fold_accuracy_imporve" src="https://github.com/user-attachments/assets/dab40eaa-e2f3-4163-9ae8-511bc4ca3246" />
+
+
+---
+
+### 3️⃣ Improve Voting Version
+
+> `WeatherPrediction2.ibynb`
+> 
+#### ✔ 개선 내용
+
+* Stacking → **Soft Voting Ensemble**로 변경
+* XGB + RF 확률 평균 방식
+
+#### ✔ 핵심 구조
+
+```
+(XGB + RF) → 확률 평균 → 최종 예측
+```
+
+#### ✔ 장점
+
+* 구조 단순화
+* 학습 속도 개선
+* 과적합 위험 감소
+
+#### ✔ 결과
+
+* Stacking 대비 안정적인 성능
+* 유지보수 및 디버깅 용이
+
+---
+
+### 4️⃣ Advanced Version (Final Model)
+
+> `WeatherPrediction2.ibynb`
+
+#### ✔ 주요 개선 사항
+
+* 모델 다양성 확대:
+
+  * XGBoost
+  * HistGradientBoosting
+  * CatBoost
+* **Soft Voting Ensemble**
+* 결측치 처리 제거 → 모델의 Native Handling 활용
+* 고급 Feature Engineering 추가
+
+#### ✔ 핵심 구조
+
+```
+XGB + HGB + CatBoost → Soft Voting → 최종 예측
+```
+
+#### ✔ 추가된 Feature
+
+* `humidity_temp_ratio`
+* `pressure_temp_ratio`
+
+#### ✔ 결과 (Cross Validation)
+
+<img width="576" height="455" alt="fold_accuracy_advanced" src="https://github.com/user-attachments/assets/5aa9e0a1-20a4-4f86-b27e-9c12011214d3" />
+
+
+평균 OOF Accuracy ≈ 0.78 ~ 0.79
+---
+
+## 📊 모델 비교 요약
+
+| 모델       | 방식                 | 특징      | 안정성 | 성능 |
+| -------- | ------------------ | ------- | --- | -- |
+| Baseline | 단일 모델              | 단순 구조   | ❌   | 낮음 |
+| Improve  | Stacking           | 복잡한 앙상블 | ⚠️  | 중간 |
+| Voting   | Soft Voting        | 단순 + 안정 | ⭕   | 중상 |
+| Advanced | Multi Model Voting | 고급 앙상블  | ⭕   | 최고 |
+
+---
+
+## 💡 최종 결론
+<img width="567" height="455" alt="Model Performance Comparison" src="https://github.com/user-attachments/assets/c6a004dc-fa59-4844-ad1b-e9dcaf5576bb" />
+
+
+* 단순한 모델보다 **앙상블 모델이 성능 향상에 효과적**
+* Stacking보다 **Soft Voting이 더 안정적인 결과 제공**
+* 모델 성능 향상의 핵심은:
+
+  1. 다양한 모델 조합
+  2. 적절한 Feature Engineering
+  3. K-Fold 기반 검증
+
+👉 최종적으로
+**“Advanced Soft Voting Ensemble 모델이 가장 좋은 성능과 안정성을 보였다.”**
+
+---
+
+## ⚠️ 추가 인사이트
+
+* 과도한 Feature Engineering은 오히려 과적합을 유발할 수 있음
+* 모델이 복잡해질수록 반드시 **검증 전략(K-Fold)**이 필요
+* CatBoost는 성능 향상에 기여하지만 필수 요소는 아님
+
+---
+
+## 🛠️ 사용 기술
+
+* Python
+* Pandas / NumPy
+* Scikit-learn
+* XGBoost
+* CatBoost
+
+---
+
+## ✨ 한 줄 정리
+
+> 단순 모델 → Stacking → Voting → Advanced Ensemble로 발전하며
+> **성능과 안정성을 동시에 확보한 머신러닝 파이프라인을 구축했다.**
+
